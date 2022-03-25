@@ -1,7 +1,7 @@
-import re
+from datetime import time, datetime
 
-import requests  # Модуль для обработки URL
-from bs4 import BeautifulSoup  # Модуль для работы с HTML
+import requests
+from bs4 import BeautifulSoup
 
 from data.config import RECEIVER, ADMIN
 
@@ -12,6 +12,8 @@ class CurrencyParser:
         self.headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 YaBrowser/22.1.0.2517 Yowser/2.5 Safari/537.36'}
         self.selector = ".overViewBox .left .top span:first-child, .overViewBox .current-data .top span:first-child"
         self.difference = difference
+
+        self.time_period = (time(hour=10), time(hour=19))
 
         self.price = 0
         self.update_price()
@@ -24,6 +26,10 @@ class CurrencyParser:
 
     async def check_currency(self):
         from loader import bot
+
+        current_time = datetime.now().time()
+        if current_time < self.time_period[0] or current_time > self.time_period[1]:
+            return
 
         old_price = self.price
         self.update_price()
